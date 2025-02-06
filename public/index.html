@@ -4,44 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Media Controller</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding-top: 50px;
-      }
-      button {
-        padding: 15px 30px;
-        margin: 10px;
-        font-size: 18px;
-        cursor: pointer;
-      }
-      h1 {
-        color: #333;
-      }
-      #ip-info {
-        font-size: 14px;
-        color: gray;
-      }
-      #qrcode {
-        margin-top: 20px;
-      }
-    </style>
+    <link rel="stylesheet" href="styles/index.css" />
   </head>
   <body>
     <h1>Media Controller</h1>
-    <div
-      id="qrcode"
-      style="
-        font-family: Arial, sans-serif;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-      "
-    ></div>
+    <div id="qrcode"></div>
 
     <p id="ip-info">Fetching server information...</p>
 
@@ -49,58 +16,10 @@
     <button onclick="sendCommand('next')">Next</button>
     <button onclick="sendCommand('previous')">Previous</button>
 
-    <div id="qrcode"></div>
-
     <script src="/socket.io/socket.io.js"></script>
-
-    <script>
-      const socket = io();
-
-      function sendCommand(command) {
-        socket.emit("media-control", command);
-      }
-
-      fetch("/ipinfo")
-        .then((response) => response.text())
-        .then((ip) => {
-          const accessUrl = `http://${ip}:3000`;
-          document.getElementById(
-            "ip-info"
-          ).innerText = `Access this page at: ${accessUrl} on your phone.`;
-        })
-        .catch(() => {
-          document.getElementById(
-            "ip-info"
-          ).innerText = `Unable to fetch the server IP.`;
-        });
-    </script>
 
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
 
-    <script>
-      fetch("/ipinfo")
-        .then((response) => response.text())
-        .then((ip) => {
-          const accessUrl = `http://${ip}:3000`;
-
-          document.getElementById(
-            "ip-info"
-          ).innerText = `Access this page at: ${accessUrl} on your phone.`;
-
-          const qrcode = new QRCode(document.getElementById("qrcode"), {
-            text: accessUrl, 
-            width: 128,
-            height: 128,
-            colorDark: "#000",
-            colorLight: "#fff",
-            correctLevel: QRCode.CorrectLevel.H,
-          });
-        })
-        .catch(() => {
-          document.getElementById(
-            "ip-info"
-          ).innerText = `Unable to fetch the server IP.`;
-        });
-    </script>
+    <script src="scripts/index.js"></script>
   </body>
 </html>
