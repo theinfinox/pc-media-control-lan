@@ -7,14 +7,10 @@ const os = require("os");
 const readline = require("readline");
 const { exec } = require("child_process");
 
-const dotenv = require("dotenv");
-dotenv.config();
 const app = express();
-const pwd = process.env.PWD;
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// List of available network interfaces
 function getLocalIP() {
   const interfaces = os.networkInterfaces();
   const availableInterfaces = [];
@@ -48,7 +44,7 @@ function getLocalIP() {
       const localIP = availableInterfaces[choice].address;
       console.log(`Selected IP: ${localIP}`);
       rl.close();
-      startServer(localIP);
+      setPassword(localIP);
     } else {
       console.log("Invalid choice. Exiting.");
       rl.close();
@@ -56,7 +52,23 @@ function getLocalIP() {
   });
 }
 
-function startServer(localIP) {
+function setPassword(localIP) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  rl.question("Enter server password: ", (password) => {
+    if (!password) {
+      console.log("Password cannot be empty!");
+      process.exit(1);
+    }
+    rl.close();
+    startServer(localIP, password);
+  });
+}
+
+function startServer(localIP, sessionPassword) {
   app.use(express.static(path.join(__dirname, "public")));
 
   app.get("/", (req, res) => {
@@ -67,8 +79,8 @@ function startServer(localIP) {
     console.log("Client connected");
 
     socket.on("media-control", (command) => {
-      console.log(`Received command: ${command}`);
-      handleCommand(command);
+      console.log(`Received command: ${command.command}`);
+      handleCommand(command, sessionPassword);
     });
 
     socket.on("disconnect", () => {
@@ -79,7 +91,6 @@ function startServer(localIP) {
   function executeCommand(command, platform) {
     try {
       switch (command) {
-        // Media Controls
         case "play":
         case "pause":
           robot.keyTap("audio_play");
@@ -102,13 +113,10 @@ function startServer(localIP) {
         case "volumeDown":
           robot.keyTap("audio_vol_down");
           break;
-
         case "brightnessUp":
           if (platform === "darwin") {
-            // macOS
             robot.keyTap("brightness_up");
           } else if (platform === "win32") {
-            // Windows
             exec(
               `powershell (Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, $((Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightness).CurrentBrightness + 10))`
             );
@@ -116,13 +124,10 @@ function startServer(localIP) {
             robot.keyTap("brightness_up");
           }
           break;
-
         case "brightnessDown":
           if (platform === "darwin") {
-            // macOS
             robot.keyTap("brightness_down");
           } else if (platform === "win32") {
-            // Windows
             exec(
               `powershell (Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, $((Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightness).CurrentBrightness - 10))`
             );
@@ -130,6 +135,41 @@ function startServer(localIP) {
             robot.keyTap("brightness_down");
           }
           break;
+        case "lock":
+        case "shutdown":
+        case "restart":
+        case "sleep":
+          // These commands now require password verification
+          break;
+        default:
+          console.log(`Unknown command: ${command}`);
+      }
+    } catch (error) {
+      console.error(`Error executing command ${command}:`, error);
+    }
+  }
+
+  function handleCommand(cc, sessionPassword) {
+    const platform = os.platform();
+    const command = cc.command;
+    const secure = cc.secure;
+    const clientPassword = cc.pwd;
+
+    if (secure) {
+      if (clientPassword === sessionPassword) {
+        executeSecureCommand(command, platform);
+      } else {
+        console.log("Invalid password attempt");
+        io.emit("invalid-password", "Invalid password");
+      }
+    } else {
+      executeCommand(command, platform);
+    }
+  }
+
+  function executeSecureCommand(command, platform) {
+    try {
+      switch (command) {
         case "lock":
           if (platform === "win32") {
             exec("rundll32 user32.dll,LockWorkStation");
@@ -168,30 +208,11 @@ function startServer(localIP) {
             exec("systemctl suspend");
           }
           break;
-
         default:
-          console.log(`Unknown command: ${command}`);
+          console.log(`Unknown secure command: ${command}`);
       }
     } catch (error) {
-      console.error(`Error executing command ${command}:`, error);
-    }
-  }
-
-  function handleCommand(cc) {
-    const platform = os.platform();
-    command = cc.command;
-    console.log(cc.command);
-    secure = cc.secure;
-    npwd = cc.pwd;
-    if (secure) {
-      if (npwd === process.env.PWD) {
-        executeCommand(command, platform);
-      } else {
-        console.log("Invalid password");
-        io.emit("invalid-password", "Invalid password");
-      }
-    } else {
-      executeCommand(command, platform);
+      console.error(`Error executing secure command ${command}:`, error);
     }
   }
 
@@ -203,7 +224,7 @@ function startServer(localIP) {
 
   server.listen(3000, () => {
     console.log(`Server running at http://${localIP}:3000`);
-    console.log("Password for the session is: ", process.env.PWD);
+    console.log("Session password is set");
   });
 }
 

@@ -18,7 +18,7 @@ body {
 }
 
 .container {
-  background: linear-gradient(135deg, #660066, #FFFACD);
+  background: linear-gradient(135deg, blue, skyblue);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
