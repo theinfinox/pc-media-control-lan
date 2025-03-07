@@ -17,6 +17,7 @@
     "express": "^4.21.2",
     "loudness": "^0.4.2",
     "mongodb": "^6.13.1",
+    "rcedit": "^4.0.1",
     "robotjs": "^0.6.0",
     "socket.io": "^4.8.1"
   },
@@ -30,6 +31,7 @@
     "outputPath": "dist",
     "targets": [
       "node18-win-x64"
-    ]
+    ],
+     "icon": "public/icon/icon.ico"
   }
 }
