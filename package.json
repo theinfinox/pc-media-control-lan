@@ -25,9 +25,13 @@
     "assets": [
       "public/index.html",
       "node_modules/**",
-      "node_modules/robotjs/build/Release/*.node"
+      "node_modules/robotjs/build/Release/*.node",
+      "puclic/**",
+      "public/*",
+      "public/scripts/scripts.js",
+      "public/styles/index.css"
     ],
-    "outputPath": "exece",
+    "outputPath": "dist",
     "targets": [
       "node18-win-x64"
     ]
