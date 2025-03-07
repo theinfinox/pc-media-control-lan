@@ -5,8 +5,35 @@ const socketIo = require("socket.io");
 const robot = require("robotjs");
 const os = require("os");
 const readline = require("readline");
-const { exec } = require("child_process");
 const loudness = require("loudness");  // For controlling volume
+const fs = require('fs');
+const { exec, execFile } = require("child_process");
+
+
+function getLoudnessBinaryPath() {
+  const origPath = path.join(__dirname, 'node_modules', 'loudness', 'impl', 'windows', 'adjust_get_current_system_volume_vista_plus.exe');
+  
+  if (process.pkg) {
+    // When running from a pkg snapshot, extract the file from the virtual fs.
+    const tempPath = path.join(os.tmpdir(), 'adjust_get_current_system_volume_vista_plus.exe');
+    try {
+      if (!fs.existsSync(tempPath)) {
+        // Read the file from the snapshot and write it to a real file
+        const data = fs.readFileSync(origPath);
+        fs.writeFileSync(tempPath, data, { mode: 0o755 });
+        console.log('Extracted loudness binary to:', tempPath);
+      } else {
+        console.log('Using existing extracted binary:', tempPath);
+      }
+      return tempPath;
+    } catch (error) {
+      console.error('Error extracting loudness binary:', error);
+      return null;
+    }
+  }
+  
+  return origPath;
+}
 
 const app = express();
 let pwd = "";
@@ -90,20 +117,37 @@ function startServer(localIP) {
     });
   });
 
-  // Execute commands based on platform and command type
+  // Execute volumecommands based on platform and command type
   function executeCommand(command, platform) {
     // Handle slider commands for volume and brightness
     if (typeof command === "string" && command.startsWith("volume:")) {
       // Extract volume level (0 to 100)
       let volVal = parseInt(command.split(":")[1], 10);
-      // Use loudness module to set volume
-      loudness.setVolume(volVal)
-        .then(() => {
-          console.log(`Volume set to ${volVal}`);
-        })
-        .catch((err) => console.error("Error setting volume:", err));
+      
+      if (process.pkg) {
+        // In pkg environment, use the extracted binary via execFile
+        const binaryPath = getLoudnessBinaryPath();
+        execFile(binaryPath, [String(volVal)], (err, stdout, stderr) => {
+          if (err) {
+            console.error("Error setting volume:", err);
+          } else {
+            console.log(`Volume set to ${volVal}`);
+          }
+        });
+      } else {
+        // In normal environment, use the loudness module
+        loudness.setVolume(volVal)
+          .then(() => {
+            console.log(`Volume set to ${volVal}`);
+          })
+          .catch((err) => console.error("Error setting volume:", err));
+      }
       return;
     }
+
+
+
+
 
     if (typeof command === "string" && command.startsWith("brightness:")) {
       // Extract brightness value (assuming 0 to 100)

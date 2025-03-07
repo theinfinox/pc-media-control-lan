@@ -4,7 +4,8 @@
   "description": "Control Your media playing in laptop over web ui and local wifi",
   "main": "app.js",
   "scripts": {
-    "test": "app.js"
+    "start": "node app.js",
+    "pkg": "pkg ."
   },
   "keywords": [
     "theinfinox"
@@ -21,15 +22,10 @@
   },
   "bin": "./app.js",
   "pkg": {
-    "scripts": "app.js",
     "assets": [
-      "public/index.html",
-      "node_modules/**",
-      "node_modules/robotjs/build/Release/*.node",
-      "puclic/**",
-      "public/*",
-      "public/scripts/scripts.js",
-      "public/styles/index.css"
+      "public/**",
+      "node_modules/loudness/impl/windows/*.exe",
+      "node_modules/robotjs/build/Release/*.node"
     ],
     "outputPath": "dist",
     "targets": [
