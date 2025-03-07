@@ -8,19 +8,24 @@ const readline = require("readline");
 const { exec } = require("child_process");
 
 const app = express();
-let pwd = ";"
+let pwd = ";";
 const server = http.createServer(app);
 const io = socketIo(server);
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-rl.question(`Please set a password for the session ?`, ppd => {
+
+// Ask for the password first
+rl.question("Please set a password for the session: ", (ppd) => {
   pwd = ppd;
-  
+  console.log("Password set successfully.\n");
+
+  // Now ask for network interface
+  getLocalIP();
 });
 
-// List of available network interfaces
+// List available network interfaces
 function getLocalIP() {
   const interfaces = os.networkInterfaces();
   const availableInterfaces = [];
@@ -35,14 +40,14 @@ function getLocalIP() {
 
   if (availableInterfaces.length === 0) {
     console.log("No valid network interfaces found.");
-    return "localhost";
+    startServer("localhost");
+    return;
   }
 
   console.log("Available Network Interfaces:");
   availableInterfaces.forEach((iface, index) => {
     console.log(`${index + 1}. ${iface.name} - ${iface.address}`);
   });
-
 
   rl.question("Select an interface by number: ", (input) => {
     const choice = parseInt(input, 10) - 1;
@@ -81,7 +86,6 @@ function startServer(localIP) {
   function executeCommand(command, platform) {
     try {
       switch (command) {
-        // Media Controls
         case "play":
         case "pause":
           robot.keyTap("audio_play");
@@ -104,73 +108,40 @@ function startServer(localIP) {
         case "volumeDown":
           robot.keyTap("audio_vol_down");
           break;
-
         case "brightnessUp":
-          if (platform === "darwin") {
-            // macOS
-            robot.keyTap("brightness_up");
-          } else if (platform === "win32") {
-            // Windows
+          if (platform === "win32") {
             exec(
               `powershell (Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, $((Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightness).CurrentBrightness + 10))`
             );
-          } else if (platform === "linux") {
-            robot.keyTap("brightness_up");
           }
           break;
-
         case "brightnessDown":
-          if (platform === "darwin") {
-            // macOS
-            robot.keyTap("brightness_down");
-          } else if (platform === "win32") {
-            // Windows
+          if (platform === "win32") {
             exec(
               `powershell (Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, $((Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightness).CurrentBrightness - 10))`
             );
-          } else if (platform === "linux") {
-            robot.keyTap("brightness_down");
           }
           break;
         case "lock":
           if (platform === "win32") {
             exec("rundll32 user32.dll,LockWorkStation");
-          } else if (platform === "darwin") {
-            exec(
-              "/System/Library/CoreServices/Menu\\ Extras/User.menu/Contents/Resources/CGSession -suspend"
-            );
-          } else if (platform === "linux") {
-            exec("gnome-screensaver-command -l");
           }
           break;
         case "shutdown":
           if (platform === "win32") {
             exec("shutdown /s /t 0");
-          } else if (platform === "darwin") {
-            exec("osascript -e 'tell app \"System Events\" to shut down'");
-          } else if (platform === "linux") {
-            exec("systemctl poweroff");
           }
           break;
         case "restart":
           if (platform === "win32") {
             exec("shutdown /r /t 0");
-          } else if (platform === "darwin") {
-            exec("osascript -e 'tell app \"System Events\" to restart'");
-          } else if (platform === "linux") {
-            exec("systemctl reboot");
           }
           break;
         case "sleep":
           if (platform === "win32") {
             exec("rundll32.exe powrprof.dll,SetSuspendState 0,1,0");
-          } else if (platform === "darwin") {
-            exec("pmset sleepnow");
-          } else if (platform === "linux") {
-            exec("systemctl suspend");
           }
           break;
-
         default:
           console.log(`Unknown command: ${command}`);
       }
@@ -181,12 +152,12 @@ function startServer(localIP) {
 
   function handleCommand(cc) {
     const platform = os.platform();
-    command = cc.command;
-    console.log(cc.command);
-    secure = cc.secure;
-    npwd = cc.pwd;
+    let command = cc.command;
+    let secure = cc.secure;
+    let npwd = cc.pwd;
+
     if (secure) {
-      if (npwd === process.env.PWD) {
+      if (npwd === pwd) {
         executeCommand(command, platform);
       } else {
         console.log("Invalid password");
@@ -198,15 +169,11 @@ function startServer(localIP) {
   }
 
   app.get("/ipinfo/", (req, res) => {
-    res.send({
-      ip: localIP,
-    });
+    res.send({ ip: localIP });
   });
 
   server.listen(3000, () => {
     console.log(`Server running at http://${localIP}:3000`);
-    console.log("Password for the session is: ", process.env.PWD);
+    console.log("Password for the session is:", pwd);
   });
 }
-
-getLocalIP();
