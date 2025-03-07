@@ -1,280 +1,235 @@
 :root {
-  --primary-color: #2196f3;
-  --secondary-color: #1976d2;
-  --background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-  --text-color: #ffffff;
+  /* Minimalist Dark Theme Colors */
+  --background: #121212;            /* Page background */
+  --container-bg: #1e1e1e;           /* Container background */
+  --text-color: #e0e0e0;             /* Default text color */
+  --button-bg: #2e2e2e;              /* Button default background */
+  --button-hover-bg: #3a3a3a;        /* Button hover background */
+  --accent-color: #007BFF;           /* Accent for play/pause */
+  --danger-color: #cc3333;           /* Danger (e.g., shutdown) */
+  --warning-color: #cc9933;          /* Warning (e.g., lock) */
+  
+  /* Icon sizes */
+  --icon-size-large: 2.5rem;
+  --icon-size-medium: 2rem;
+  --icon-size-small: 1.5rem;
 }
 
+/* Global Styles */
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--background);
-  color: var(--text-color);
-  min-height: 100vh;
   margin: 0;
   padding: 20px;
+  background: var(--background);
+  color: var(--text-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
 }
 
+/* Main Container */
 .container {
-  background: linear-gradient(135deg, #660066, #FFFACD);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  background: var(--container-bg);
+  border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   max-width: 90vw;
-  width: 100%;
-  border: 1px solid grey;
+  width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* Header & QR Code */
 .header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .header h1 {
-  color: var(--text-color);
+  font-size: 2rem;
   margin: 0;
-  font-size: 2.2em;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: 30px;
-  align-content: center;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  justify-items: center;
-}
-
-.control-collection {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-}
-
-.control-btn {
-  background: white;
-  border: none;
-  padding: 15px 20px;
-  border-radius: 12px;
-  color: #1a4071;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: 60px;
-  border-radius: 30px;
-  height: 60px;
-  align-content: center;
-  justify-content: center;
-}
-
-.control-btn:hover {
-  background: #083767;
-  color: #2196f3;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.control-btn:active {
-  transform: translateY(0);
-}
-
-.control-btn .material-icons {
-  font-size: 28px;
-}
-
-.play-pause {
-  grid-column: span 1;
-  background: #1a4071;
-  color: #62b5ff;
-  border: 1px solid #62b5ff7a;
-}
-
-.play-pause:hover {
-  background: #62b5ff;
-  color: #1a4071;
+#ip-info {
+  font-size: 0.9rem;
+  margin: 10px 0;
 }
 
 .qrcode-container {
-  background: rgba(255, 255, 255, 0.9);
+  background: #222;
   padding: 20px;
-  border-radius: 15px;
-  margin: 20px 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.qr-caption {
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+/* Control Sections */
+.control-section {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #1e1e1e;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Media Controls: One horizontal row */
+/* Add the "media-controls" class to the media controls section in your HTML */
+.control-section.media-controls .controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* System Controls: 3 columns x 2 rows */
+/* In your HTML, ensure the system controls section has the class "system-controls" */
+.control-section.system-controls .controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* Common Controls Grid */
+.controls {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Control Button Styles */
+.control-btn {
+  background: var(--button-bg);
+  border: none;
+  color: var(--text-color);
+  padding: 15px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  width: 100%;
-  max-width: 300px;
+  transition: background 0.3s;
 }
 
-.qr-caption {
-  color: #666;
-  font-size: 0.9em;
-  margin: 10px 0 0;
+.control-btn:hover {
+  background: var(--button-hover-bg);
 }
 
-#ip-info {
-  color: #ccc;
-  font-size: 0.95em;
-  margin: 15px 0;
-}
-@media (max-width: 480px) {
-  .controls {
-    grid-template-columns: repeat(3,1fr);
-  }
-
-  .control-btn {
-    flex-direction: row;
-    justify-content: center;
-  }
-}
-.control-section {
-  margin: 20px 0;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  position: relative;
-  width: 100%;
-  max-width: 600px;
+.control-btn:active {
+  background: var(--button-bg);
 }
 
-.section-title {
-  color: #fff;
+.control-btn .material-icons {
+  font-size: var(--icon-size-large);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .header h1 {
-    font-size: 1.8em;
-  }
-
-  .controls {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .control-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 14px;
-  }
-
-  .control-btn .material-icons {
-    font-size: 24px;
-  }
-
-  .qrcode-container {
-    max-width: 250px;
-  }
+/* Specific Button Adjustments */
+.play-pause {
+  background: var(--accent-color);
+  color: var(--background);
 }
 
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: 1.5em;
-  }
-
-  .controls {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .control-btn {
-    width: 45px;
-    height: 45px;
-    font-size: 12px;
-  }
-
-  .control-btn .material-icons {
-    font-size: 20px;
-  }
-
-  .qrcode-container {
-    max-width: 200px;
-  }
+.danger {
+  background: var(--danger-color) !important;
 }
-/* Slider Styles */
+
+.warning {
+  background: var(--warning-color) !important;
+}
+
+/* Slider Controls */
 .slider-container {
   width: 100%;
   max-width: 300px;
-  margin: 20px 0;
+  margin: 20px auto;
 }
 
 .slider-wrapper {
   position: relative;
-  padding: 15px 0;
+  padding: 10px 0;
 }
 
 .slider {
-  appearance: none;
   width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 4px;
+  background: #333;
   outline: none;
-  border-radius: 3px;
+  border-radius: 2px;
+  appearance: none;
 }
 
 .slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--primary-color);
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
+  background: var(--accent-color);
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s;
 }
 
 .slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: var(--primary-color);
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
+  background: var(--accent-color);
   cursor: pointer;
 }
 
 .slider-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9em;
+  font-size: 0.8rem;
+  margin-top: 4px;
 }
 
-/* Responsive adjustments for sliders */
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    padding: 20px;
+  }
+  .header h1 {
+    font-size: 1.75rem;
+  }
+  .control-btn {
+    padding: 12px;
+  }
+  .control-btn .material-icons {
+    font-size: var(--icon-size-medium);
+  }
+}
+
 @media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  .control-btn {
+    padding: 10px;
+  }
+  .control-btn .material-icons {
+    font-size: var(--icon-size-small);
+  }
   .slider-container {
     max-width: 250px;
   }
-
-  .slider::-webkit-slider-thumb {
-    width: 18px;
-    height: 18px;
-  }
-}
-.danger {
-  background-color: #ff4444 !important;
-}
-.warning {
-  background-color: #ffbb33 !important;
 }
