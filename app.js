@@ -5,7 +5,7 @@ const socketIo = require("socket.io");
 const robot = require("robotjs");
 const os = require("os");
 const readline = require("readline");
-const loudness = require("loudness");  // For controlling volume
+const loudness = require("loudness");  
 const fs = require('fs');
 const { exec, execFile } = require("child_process");
 
@@ -14,11 +14,10 @@ function getLoudnessBinaryPath() {
   const origPath = path.join(__dirname, 'node_modules', 'loudness', 'impl', 'windows', 'adjust_get_current_system_volume_vista_plus.exe');
   
   if (process.pkg) {
-    // When running from a pkg snapshot, extract the file from the virtual fs.
     const tempPath = path.join(os.tmpdir(), 'adjust_get_current_system_volume_vista_plus.exe');
     try {
       if (!fs.existsSync(tempPath)) {
-        // Read the file from the snapshot and write it to a real file
+0
         const data = fs.readFileSync(origPath);
         fs.writeFileSync(tempPath, data, { mode: 0o755 });
         console.log('Extracted loudness binary to:', tempPath);
